@@ -28,6 +28,8 @@ th,td{padding:.5rem .7rem;text-align:left;border-bottom:1px solid var(--rule);wh
 thead th{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);font-weight:500}
 table.num td+td,table.num th+th{text-align:right;font-variant-numeric:tabular-nums}
 caption{white-space:normal;max-width:740px}
+.callout{margin:1.5rem 0;padding:1rem 1.2rem;border-left:3px solid var(--acc);background:var(--wash);font-size:.98rem}
+.callout strong{font-family:var(--sans);font-size:.88rem}
 .refs li{font-size:.95rem}.meta{font:.85rem/1.5 var(--sans);color:var(--meta)}
 @media(max-width:900px){.page{grid-template-columns:1fr}aside{display:none}}
 @media print{.top,aside{display:none}.page{display:block}}

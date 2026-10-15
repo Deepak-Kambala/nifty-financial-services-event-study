@@ -18,7 +18,7 @@
 
 <div class="wrap page">
 <aside><nav aria-label="Contents">
-  <a href="#question">Question</a><a href="#data">Data and events</a><a href="#method">Method</a><a href="#results">Results</a><a href="#reading">Reading the results</a><a href="#notes">Notes on the source</a><a href="#refs">References</a>
+  <a href="#question">Question</a><a href="#data">Data and events</a><a href="#method">Method</a><a href="#results">Results</a><a href="#reading">What the numbers mean</a><a href="#limits">Limits</a><a href="#notes">Source notes</a><a href="#refs">References</a>
 </nav></aside>
 
 <main>
@@ -29,8 +29,9 @@
 
 <section id="question">
   <h2>Question</h2>
-  <p>This study examines whether six policy announcements were followed by returns that differed from the index's recent average return. The index is a sectoral benchmark of the 20 largest NSE-listed financial-services companies by free-float market capitalisation.</p>
-  <p>It reports the return on the announcement day, the cumulative abnormal return over 11 trading days, and the change in return volatility. The largest reaction was on the Union Budget 2026 event day: abnormal return −2.264%. The study's second test reports <i>t</i> = −4.159 and <i>p</i> = 0.0003 for that observation. This is evidence of an unusually large movement relative to the study's baseline; it does not by itself prove that the announcement caused the entire move.</p>
+  <p>This page explains what the paper and its notebook calculate when they compare the NIFTY Financial Services Index with its own recent return history around selected Reserve Bank of India (RBI) Monetary Policy Committee (MPC) decisions and Union Budgets. It is a compact, reproducible case study in reading an event study: what was measured, how the comparison works, and what the results can and cannot establish.</p>
+  <p>The largest event-day abnormal return in the six analysed events is −2.264% for Union Budget 2026. The notebook’s event-day statistic is <i>t</i> = −4.159, with a two-sided <i>p</i> = 0.0003. This says the event-day move was large relative to the notebook’s estimated recent variability under its test assumptions. It does not isolate the Budget’s causal effect from other information or market forces.</p>
+  <div class="callout"><strong>Read this first.</strong> An abnormal return is a comparison with a modelled baseline, not a directly observed “effect” of a policy. The index moved; the study subtracts its average return in a preceding window to describe how unusual that movement was against this specific benchmark.</div>
 </section>
 
 <section id="data">
@@ -44,6 +45,10 @@
     </tbody>
   </table>
   <p>The paper identifies seven relevant policy events, but analyses six. The April 2025 MPC decision is excluded because there are not enough earlier observations for the 30-day estimation window.</p>
+  <h3>What is in the index data?</h3>
+  <p>The CSV contains one daily row with date, open, high, low, close, shares traded and turnover. The notebook sorts rows chronologically and calculates returns from consecutive closing levels. The paper describes the index as tracking 20 large NSE-listed financial-services companies, weighted by free-float market capitalisation. This is an index-level study: it does not estimate separate reactions for individual banks, insurers or other constituents.</p>
+  <h3>Why these announcements?</h3>
+  <p>The paper selects scheduled fiscal and monetary announcements because they can convey information relevant to financial firms. RBI policy can affect borrowing costs and interest-rate expectations; budget measures can affect taxes, public spending and financial-market rules. These are possible transmission channels described in the paper, not mechanisms separately tested by this dataset.</p>
 </section>
 
 <section id="method">
@@ -67,62 +72,76 @@
     <figcaption>Figure 1. Window layout as defined by the paper's equations and implemented in the notebook. The estimation window ends one day before the event window begins; the two are adjacent.</figcaption>
   </figure>
   <h3>Event day and windows</h3>
+  <p>For each announcement, the notebook locates the announcement date in the trading calendar; if it is not a trading day, it uses the next available trading day. Relative day 0 is that selected date. Day −1 and +1 mean the preceding and following observations in the dataset, not necessarily calendar days.</p>
   <div class="eq">t_0 = \min\{\, t \in \mathcal{T} \mid t \ge t_{\text{announced}} \,\}</div>
   <div class="eq">W = \{t : t_0-5 \le t \le t_0+5\}, \qquad L = \{t : t_0-35 \le t \le t_0-6\}</div>
-  <p><span class="m">\mathcal{T}</span> is the set of trading days in the dataset and <span class="m">t_{\text{announced}}</span> the official date. The rule prevents the event day from preceding the release.</p>
+  <p><span class="m">\mathcal{T}</span> is the set of trading days in the dataset and <span class="m">t_{\text{announced}}</span> the official date. The rule prevents the event day from preceding the release. The event window contains 11 observations: five before, the event day, and five after. Its pre-event portion can include anticipation or other news; the post-event portion can include follow-up information.</p>
   <h3>Abnormal and cumulative abnormal returns</h3>
   <div class="eq">R_t = \frac{\text{Close}_t - \text{Close}_{t-1}}{\text{Close}_{t-1}} \times 100, \qquad \bar R_i = \frac{1}{30}\sum_{t\in L} R_{it}</div>
   <div class="eq">AR_{it} = R_{it} - \bar R_i, \qquad CAR_i(-5,+5) = \sum_{t=-5}^{+5} AR_{it}</div>
   <p>A negative <span class="m">AR_{it}</span> means the index returned less than its estimation-window average. <span class="m">CAR_i</span> is the sum across all 11 trading days, including the five days before the event.</p>
+  <p><strong>Small example.</strong> If a day’s observed return is +0.50% and the preceding-window average is +0.10%, its abnormal return is +0.40 percentage points. It does not mean the index itself rose by 0.40%; that was +0.50%. Because this is a mean-adjusted model, the “normal” return is a historical average for this index, not a forecast based on the whole market or a control index.</p>
   <h3>Volatility</h3>
   <div class="eq">\sigma_{i,\text{pre}} = \operatorname{std}\{R_t : t\in[t_0-35,\,t_0-6]\}, \quad \sigma_{i,\text{post}} = \operatorname{std}\{R_t : t\in[t_0,\,t_0+5]\}, \quad \Delta\sigma_i = \sigma_{i,\text{post}}-\sigma_{i,\text{pre}}</div>
   <p>The post-event volatility uses the event day and the following five trading days. The paper also plots a 30-day rolling standard deviation for the full sample.</p>
   <h3>Significance tests</h3>
-  <p><strong>Test 1</strong> is a one-sample t-test of whether the mean of the 11 window abnormal returns is zero (10 degrees of freedom). <strong>Test 2</strong> is described in the paper as a Patell standardised event-day test. The notebook calculates the event-day abnormal return divided by the estimation-window standard deviation:</p>
+  <p><strong>Test 1</strong> is a one-sample t-test of whether the mean of the 11 window abnormal returns is zero (10 degrees of freedom). It tests the window’s average AR, not the CAR directly. <strong>Test 2</strong> is called a Patell test in the paper, but the notebook’s implemented calculation is the event-day abnormal return divided by the estimation-window standard deviation:</p>
   <div class="eq">t_2 = \frac{AR_{i0}}{\sigma_{i,\text{pre}}}, \qquad p = 2\,P(T_{29} > |t_2|)</div>
-  <p>It then uses a two-sided Student's <i>t</i> reference distribution with 29 degrees of freedom. For the Budget, −2.264 / 0.544 is approximately −4.16. This is the statistic implemented in the notebook; it should not be read as a full market-model causal test.</p>
+  <p>The notebook uses a two-sided Student’s <i>t</i> reference distribution with 29 degrees of freedom, based on 30 estimation-window returns. For the Budget, −2.264 / 0.544 is approximately −4.16. This page reports the notebook’s implemented statistic and p-value. The paper’s “Patell” label should be treated cautiously: the code shown does not implement a market model or a broader causal test.</p>
 </section>
 
 <section id="results">
   <h2>Results</h2>
   <table class="num">
     <caption>Table 1. Event-day and window results as reported in the paper (Tables 6.1 and 6.4) and reproduced in the notebook output. All values in percent except test statistics and p-values.</caption>
-    <thead><tr><th>Event</th><th>AR₀</th><th>CAR(−5,+5)</th><th>σ<sub>pre</sub></th><th>σ<sub>post</sub></th><th>Δσ</th><th>T1 p</th><th>T2 t</th><th>T2 p</th></tr></thead>
+    <thead><tr><th>Event</th><th>Baseline R̄</th><th>AR₀</th><th>CAR(−5,+5)</th><th>σ<sub>pre</sub></th><th>σ<sub>post</sub></th><th>Δσ</th><th>T1 p</th><th>T2 t</th><th>T2 p</th></tr></thead>
     <tbody>
-      <tr><td>MPC Jun 2025</td><td>1.589</td><td>−2.278</td><td>1.133</td><td>1.010</td><td>−0.123</td><td>0.3916</td><td>1.402</td><td>0.1714</td></tr>
-      <tr><td>MPC Aug 2025</td><td>−0.042</td><td>−2.099</td><td>0.697</td><td>0.750</td><td>0.053</td><td>0.2841</td><td>−0.061</td><td>0.9518</td></tr>
-      <tr><td>MPC Oct 2025</td><td>1.332</td><td>0.078</td><td>0.620</td><td>0.669</td><td>0.049</td><td>0.9743</td><td>2.149</td><td><b>0.0401</b></td></tr>
-      <tr><td>MPC Dec 2025</td><td>0.842</td><td>−2.484</td><td>0.606</td><td>0.701</td><td>0.095</td><td>0.2251</td><td>1.389</td><td>0.1754</td></tr>
-      <tr><td>Union Budget 2026</td><td>−2.264</td><td>3.015</td><td>0.544</td><td>1.798</td><td>1.253</td><td>0.5374</td><td>−4.159</td><td><b>0.0003</b></td></tr>
-      <tr><td>MPC Feb 2026</td><td>0.430</td><td>3.018</td><td>0.625</td><td>0.695</td><td>0.070</td><td>0.5193</td><td>0.688</td><td>0.4969</td></tr>
+      <tr><td>MPC Jun 2025</td><td>+0.161</td><td>1.589</td><td>−2.278</td><td>1.133</td><td>1.010</td><td>−0.123</td><td>0.3916</td><td>1.402</td><td>0.1714</td></tr>
+      <tr><td>MPC Aug 2025</td><td>+0.034</td><td>−0.042</td><td>−2.099</td><td>0.697</td><td>0.750</td><td>0.053</td><td>0.2841</td><td>−0.061</td><td>0.9518</td></tr>
+      <tr><td>MPC Oct 2025</td><td>+0.052</td><td>1.332</td><td>0.078</td><td>0.620</td><td>0.669</td><td>0.049</td><td>0.9743</td><td>2.149</td><td><b>0.0401</b></td></tr>
+      <tr><td>MPC Dec 2025</td><td>+0.138</td><td>0.842</td><td>−2.484</td><td>0.606</td><td>0.701</td><td>0.095</td><td>0.2251</td><td>1.389</td><td>0.1754</td></tr>
+      <tr><td>Union Budget 2026</td><td>−0.047</td><td>−2.264</td><td>3.015</td><td>0.544</td><td>1.798</td><td>1.253</td><td>0.5374</td><td>−4.159</td><td><b>0.0003</b></td></tr>
+      <tr><td>MPC Feb 2026</td><td>−0.005</td><td>0.430</td><td>3.018</td><td>0.625</td><td>0.695</td><td>0.070</td><td>0.5193</td><td>0.688</td><td>0.4969</td></tr>
     </tbody>
   </table>
-  <p>On Test 2, the Budget (p = 0.0003) and October 2025 MPC (p = 0.0401) are statistically significant at the 5% level; only the Budget meets the 1% threshold. Test 1 is not significant for any event. Budget volatility rises from 0.544% before the event to 1.798% after it, a change of +1.253 percentage points. Its full-window CAR is +3.015% despite the −2.264% event-day abnormal return, meaning the other days in the 11-day window more than offset the event-day decline.</p>
+  <p><strong>Table guide.</strong> Baseline R̄ is the mean daily return across the 30-day estimation window. AR₀ and CAR are percentage returns; volatility columns are standard deviations of daily returns, also in percent. Δσ is σ<sub>post</sub> − σ<sub>pre</sub> and is therefore a percentage-point difference. T1 p is the window test’s p-value; T2 t and T2 p are the notebook’s event-day statistic and p-value.</p>
+  <p>At the conventional 5% threshold, Test 2 rejects its zero-abnormal-return null for the Budget (p = 0.0003) and October 2025 MPC (p = 0.0401). Only the Budget result is below 1%. Test 1 does not reject for any event. These are nominal p-values: the notebook reports 12 tests (two for each of six events) and does not adjust for multiple comparisons.</p>
+  <p>For the Budget, post-event daily-return standard deviation is 1.798%, compared with 0.544% in the estimation window: a difference of +1.253 percentage points. This is a descriptive comparison of two short windows; the notebook does not run a formal test of the volatility difference. Its 11-day CAR is +3.015% even though event-day AR is −2.264%. The other ten days therefore sum to about +5.279 percentage points of abnormal return. This arithmetic describes the window; it does not establish that the Budget caused a recovery.</p>
 </section>
 
 <section id="reading">
-  <h2>Reading the results</h2>
-  <p>These are direct readings of the reported numbers, not claims that the study tested a particular news explanation.</p>
-  <h3>The two February 2026 windows overlap</h3>
-  <p>The Budget event (1 February) and the February MPC decision (6 February) are close together. Their 11-day windows therefore overlap. The reported CARs for these two events should not be treated as independent pieces of evidence.</p>
+  <h2>What the numbers mean</h2>
+  <p>Use the measures together. AR₀ describes one day relative to the estimated baseline; CAR describes the sum across the complete 11-day window; volatility compares the spread of daily returns in two windows. None is a direct measure of investor beliefs or policy success.</p>
+  <h3>How to read one row</h3>
+  <p>Take the October 2025 MPC row. The index’s event-day return exceeded its preceding 30-day mean by 1.332 percentage points (AR₀). Across all 11 days, the sum of abnormal returns was +0.078%, close to zero (CAR). The event-day test gives p = 0.0401, but the 11-day mean test gives p = 0.9743. So this analysis flags a relatively unusual event-day observation under Test 2, while it finds no evidence that the average AR across the whole window differs from zero under Test 1. The tests address different summaries of the data.</p>
+  <h3>What the Budget row says</h3>
+  <p>The event-day AR is negative and unusually large relative to the notebook’s baseline. The full-window CAR is positive because gains in abnormal returns on other days outweigh the event-day decline. Post-event volatility is also markedly higher than the pre-event estimate. Together these values describe a sharp one-day move and a choppy following window; they do not identify which news drove either pattern.</p>
   <h3>Event-day significance and window significance disagree</h3>
   <p>For the Budget, Test 2 is significant (p = 0.0003), while Test 1 is not (p = 0.5374). The tests answer different questions: whether the event-day abnormal return was unusual relative to the estimation-window variation, and whether the mean abnormal return across the full 11-day window differed from zero.</p>
-  <h3>Scope</h3>
+  <h3>Closely spaced dates</h3>
+  <p>The Budget date, 1 February 2026, and MPC date, 6 February 2026, fall within five calendar days. Their trading-day windows overlap substantially. Returns in that shared period contribute to both event summaries, so the two CARs are not independent observations and cannot cleanly separate the two announcements’ effects.</p>
+</section>
+
+<section id="limits">
+  <h2>Limits of this analysis</h2>
   <ul>
-    <li>Six events and one index. The paper itself attributes non-significant results to low power.</li>
-    <li>Twelve tests are reported (two per event) with no multiple-comparison adjustment described; the October 2025 result at p = 0.0401 is the weaker of the two rejections.</li>
-    <li>The mean-adjusted model has no market benchmark, so broad market moves in the window are not removed from the abnormal returns.</li>
-    <li>The study does not measure investor expectations, the surprise component of an announcement, or the independent effect of other news on the same days.</li>
+    <li><strong>Small event count:</strong> six analysed events, with only 11 daily observations in each event window. A non-significant result means this test did not reject its null; it does not prove there was no market response.</li>
+    <li><strong>No control benchmark:</strong> the mean-adjusted model subtracts the index’s prior average return but does not remove market-wide or other sector-wide movements.</li>
+    <li><strong>Announcements are not surprises:</strong> the data do not measure what markets expected beforehand or how much new information each announcement contained.</li>
+    <li><strong>Other news may coincide:</strong> the design does not control for simultaneous company, economic or global news.</li>
+    <li><strong>Overlapping February windows:</strong> Budget and MPC measurements share event-window observations.</li>
+    <li><strong>Statistical assumptions:</strong> the notebook uses parametric t-tests on short daily-return samples. It reports no correction for the 12 comparisons. The volatility changes are not accompanied by a significance test.</li>
+    <li><strong>One index and one year:</strong> results describe this index in the available sample, not every financial firm, future policy announcement or other market.</li>
   </ul>
 </section>
 
 <section id="notes">
-  <h2>Notes on the source</h2>
+  <h2>Source notes</h2>
   <p>For transparency, the paper and the executable notebook describe the inputs and method slightly differently in places:</p>
   <ul>
     <li><b>Sample period.</b> Paper: 31 Mar 2025 to 31 Mar 2026. Notebook output: 1 Apr 2025 to 30 Mar 2026, 247 trading days.</li>
     <li><b>Event count.</b> The paper says seven relevant events were identified and six were analysed. The notebook's event dictionary also includes the February 2025 Union Budget, which is outside the sample and produces no usable result.</li>
-    <li><b>Test 2 description.</b> The paper labels Test 2 a Patell test. The notebook implementation is the event-day abnormal return divided by the estimation-window standard deviation, followed by a two-sided <i>t</i> p-value.</li>
+    <li><b>Test 2 description.</b> The paper labels Test 2 a Patell test. The notebook computes event-day abnormal return divided by the sample standard deviation in the estimation window, then uses a two-sided Student’s <i>t</i> p-value with n − 1 degrees of freedom. This implementation detail is stated explicitly here because the label alone does not describe the code’s calculation.</li>
     <li><b>Rounding.</b> The Budget's pre-event volatility appears as 0.544% in the results table and about 0.545% in the discussion; the difference is rounding.</li>
     <li><b>Interpretation.</b> The paper discusses possible explanations for the Budget reaction, but the event study does not separately test those explanations.</li>
   </ul>
@@ -136,7 +155,7 @@
     <li>A. C. MacKinlay (1997). Event studies in economics and finance. <i>Journal of Economic Literature</i> 35, 13–39.</li>
     <li>J. A. Patell (1976). Corporate forecasts of earnings per share and stock price behavior: Empirical test. <i>Journal of Accounting Research</i> 14, 246–276.</li>
   </ol>
-  <p class="meta">Data: <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY%20FINANCIAL%20SERVICES-31-03-2025-to-31-03-2026.csv">NSE India historical index dataset</a>. Code: <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY_ICFMCF.ipynb">NIFTY_ICFMCF.ipynb</a>. This page summarises the paper and adds the analysis marked above; the paper is the authoritative source.</p>
+  <p class="meta">Primary materials: <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/paper.pdf">research paper PDF</a>, <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY_ICFMCF.ipynb">analysis notebook</a>, and <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY%20FINANCIAL%20SERVICES-31-03-2025-to-31-03-2026.csv">CSV data</a>. Numerical results above follow notebook output where the paper’s description and code differ. The added explanations clarify calculations and limitations; they do not add new empirical findings.</p>
 </section>
 </main>
 </div>
