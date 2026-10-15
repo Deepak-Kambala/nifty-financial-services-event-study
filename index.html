@@ -64,12 +64,12 @@
         <text x="254" y="42">Estimation window L: t₀−35 … t₀−6 (30 days)</text>
         <text x="552" y="42">W: t₀−5 … t₀+5 (11 days)</text>
         <text x="37" y="97">t₀−35</text><text x="472" y="97">t₀−5</text><text x="552" y="97">t₀</text><text x="632" y="97">t₀+5</text>
-        <text x="254" y="64" class="in">normal return R̄ and σ_pre computed here</text>
+        <text x="254" y="64" class="in">baseline return and pre-event volatility</text>
         <text x="508" y="116" class="sm">pre-event</text><text x="590" y="116" class="sm">post-event σ</text>
       </g>
       <g class="ax"><line x1="545" y1="104" x2="632" y2="104"/><line x1="472" y1="104" x2="545" y2="104"/></g>
     </svg>
-    <figcaption>Figure 1. Window layout as defined by the paper's equations and implemented in the notebook. The estimation window ends one day before the event window begins; the two are adjacent.</figcaption>
+    <figcaption>Figure 1. Window layout used by the notebook. In notation, <span class="m">L=[t_0-35,t_0-6]</span> supplies 30 returns and <span class="m">W=[t_0-5,t_0+5]</span> contains 11. The windows are adjacent and do not overlap.</figcaption>
   </figure>
   <h3>Event day and windows</h3>
   <p>For each announcement, the notebook locates the announcement date in the trading calendar; if it is not a trading day, it uses the next available trading day. Relative day 0 is that selected date. Day −1 and +1 mean the preceding and following observations in the dataset, not necessarily calendar days.</p>
@@ -83,10 +83,12 @@
   <p><strong>Small example.</strong> If a day’s observed return is +0.50% and the preceding-window average is +0.10%, its abnormal return is +0.40 percentage points. It does not mean the index itself rose by 0.40%; that was +0.50%. Because this is a mean-adjusted model, the “normal” return is a historical average for this index, not a forecast based on the whole market or a control index.</p>
   <h3>Volatility</h3>
   <div class="eq">\sigma_{i,\text{pre}} = \operatorname{std}\{R_t : t\in[t_0-35,\,t_0-6]\}, \quad \sigma_{i,\text{post}} = \operatorname{std}\{R_t : t\in[t_0,\,t_0+5]\}, \quad \Delta\sigma_i = \sigma_{i,\text{post}}-\sigma_{i,\text{pre}}</div>
-  <p>The post-event volatility uses the event day and the following five trading days. The paper also plots a 30-day rolling standard deviation for the full sample.</p>
+  <p>The post-event volatility uses the event day and the following five trading days. The paper also plots a rolling 30-observation sample standard deviation, <span class="m">s_{30,t}=\operatorname{sd}(R_{t-29},\ldots,R_t)</span>, across the full sample. Each plotted value summarizes the most recent 30 daily returns, so it changes as the window advances.</p>
   <h3>Significance tests</h3>
-  <p><strong>Test 1</strong> is a one-sample t-test of whether the mean of the 11 window abnormal returns is zero (10 degrees of freedom). It tests the window’s average AR, not the CAR directly. <strong>Test 2</strong> is called a Patell test in the paper, but the notebook’s implemented calculation is the event-day abnormal return divided by the estimation-window standard deviation:</p>
-  <div class="eq">t_2 = \frac{AR_{i0}}{\sigma_{i,\text{pre}}}, \qquad p = 2\,P(T_{29} > |t_2|)</div>
+  <p><strong>Test 1</strong> is a one-sample t-test on the 11 daily abnormal returns in <span class="m">W</span>. It tests whether their sample mean is zero; it does not test the full-window CAR directly:</p>
+  <div class="eq">t_1=\frac{\overline{AR}_{i,W}}{s_{AR,i,W}/\sqrt{11}},\qquad p_1=2\Pr\!\left(T_{10}\geq |t_1|\right)</div>
+  <p><strong>Test 2</strong> is called a Patell test in the paper, but the notebook’s implemented calculation is the event-day abnormal return divided by the estimation-window standard deviation:</p>
+  <div class="eq">t_2=\frac{AR_{i0}}{s_{i,\text{pre}}},\qquad p_2=2\Pr\!\left(T_{29}\geq |t_2|\right)</div>
   <p>The notebook uses a two-sided Student’s <i>t</i> reference distribution with 29 degrees of freedom, based on 30 estimation-window returns. For the Budget, −2.264 / 0.544 is approximately −4.16. This page reports the notebook’s implemented statistic and p-value. The paper’s “Patell” label should be treated cautiously: the code shown does not implement a market model or a broader causal test.</p>
 </section>
 
@@ -94,7 +96,7 @@
   <h2>Results</h2>
   <table class="num">
     <caption>Table 1. Event-day and window results as reported in the paper (Tables 6.1 and 6.4) and reproduced in the notebook output. All values in percent except test statistics and p-values.</caption>
-    <thead><tr><th>Event</th><th>Baseline R̄</th><th>AR₀</th><th>CAR(−5,+5)</th><th>σ<sub>pre</sub></th><th>σ<sub>post</sub></th><th>Δσ</th><th>T1 p</th><th>T2 t</th><th>T2 p</th></tr></thead>
+    <thead><tr><th>Event</th><th>Baseline <span class="m">\bar{R}</span></th><th><span class="m">AR_0</span></th><th><span class="m">CAR(-5,+5)</span></th><th><span class="m">\sigma_{\text{pre}}</span></th><th><span class="m">\sigma_{\text{post}}</span></th><th><span class="m">\Delta\sigma</span></th><th>T1 p</th><th>T2 t</th><th>T2 p</th></tr></thead>
     <tbody>
       <tr><td>MPC Jun 2025</td><td>+0.161</td><td>1.589</td><td>−2.278</td><td>1.133</td><td>1.010</td><td>−0.123</td><td>0.3916</td><td>1.402</td><td>0.1714</td></tr>
       <tr><td>MPC Aug 2025</td><td>+0.034</td><td>−0.042</td><td>−2.099</td><td>0.697</td><td>0.750</td><td>0.053</td><td>0.2841</td><td>−0.061</td><td>0.9518</td></tr>
@@ -104,18 +106,18 @@
       <tr><td>MPC Feb 2026</td><td>−0.005</td><td>0.430</td><td>3.018</td><td>0.625</td><td>0.695</td><td>0.070</td><td>0.5193</td><td>0.688</td><td>0.4969</td></tr>
     </tbody>
   </table>
-  <p><strong>Table guide.</strong> Baseline R̄ is the mean daily return across the 30-day estimation window. AR₀ and CAR are percentage returns; volatility columns are standard deviations of daily returns, also in percent. Δσ is σ<sub>post</sub> − σ<sub>pre</sub> and is therefore a percentage-point difference. T1 p is the window test’s p-value; T2 t and T2 p are the notebook’s event-day statistic and p-value.</p>
+  <p><strong>Table guide.</strong> <span class="m">\bar{R}</span> is the mean daily return across the 30-day estimation window. <span class="m">AR_0</span> and <span class="m">CAR(-5,+5)</span> are percentage returns; volatility columns are standard deviations of daily returns, also in percent. <span class="m">\Delta\sigma=\sigma_{\text{post}}-\sigma_{\text{pre}}</span> is therefore a percentage-point difference. T1 p is the window test’s p-value; T2 t and T2 p are the notebook’s event-day statistic and p-value.</p>
   <p>At the conventional 5% threshold, Test 2 rejects its zero-abnormal-return null for the Budget (p = 0.0003) and October 2025 MPC (p = 0.0401). Only the Budget result is below 1%. Test 1 does not reject for any event. These are nominal p-values: the notebook reports 12 tests (two for each of six events) and does not adjust for multiple comparisons.</p>
-  <p>For the Budget, post-event daily-return standard deviation is 1.798%, compared with 0.544% in the estimation window: a difference of +1.253 percentage points. This is a descriptive comparison of two short windows; the notebook does not run a formal test of the volatility difference. Its 11-day CAR is +3.015% even though event-day AR is −2.264%. The other ten days therefore sum to about +5.279 percentage points of abnormal return. This arithmetic describes the window; it does not establish that the Budget caused a recovery.</p>
+  <p>For the Budget, post-event daily-return standard deviation is 1.798%, compared with 0.544% in the estimation window: <span class="m">\Delta\sigma=+1.253</span> percentage points. This is a descriptive comparison of two short windows; the notebook does not run a formal test of the volatility difference. Its 11-day <span class="m">CAR(-5,+5)</span> is +3.015% even though event-day <span class="m">AR_0</span> is −2.264%. The other ten days therefore sum to about +5.279 percentage points of abnormal return. This arithmetic describes the window; it does not establish that the Budget caused a recovery.</p>
 </section>
 
 <section id="reading">
   <h2>What the numbers mean</h2>
-  <p>Use the measures together. AR₀ describes one day relative to the estimated baseline; CAR describes the sum across the complete 11-day window; volatility compares the spread of daily returns in two windows. None is a direct measure of investor beliefs or policy success.</p>
+  <p>Use the measures together. <span class="m">AR_0</span> describes one day relative to the estimated baseline; <span class="m">CAR(-5,+5)</span> describes the sum across the complete 11-day window; volatility compares the spread of daily returns in two windows. None is a direct measure of investor beliefs or policy success.</p>
   <h3>How to read one row</h3>
-  <p>Take the October 2025 MPC row. The index’s event-day return exceeded its preceding 30-day mean by 1.332 percentage points (AR₀). Across all 11 days, the sum of abnormal returns was +0.078%, close to zero (CAR). The event-day test gives p = 0.0401, but the 11-day mean test gives p = 0.9743. So this analysis flags a relatively unusual event-day observation under Test 2, while it finds no evidence that the average AR across the whole window differs from zero under Test 1. The tests address different summaries of the data.</p>
+  <p>Take the October 2025 MPC row. The index’s event-day return exceeded its preceding 30-day mean by 1.332 percentage points (<span class="m">AR_0</span>). Across all 11 days, the sum of abnormal returns was +0.078%, close to zero (<span class="m">CAR(-5,+5)</span>). The event-day test gives <span class="m">p_2=0.0401</span>, but the 11-day mean test gives <span class="m">p_1=0.9743</span>. So this analysis flags a relatively unusual event-day observation under Test 2, while it finds no evidence that the average AR across the whole window differs from zero under Test 1. The tests address different summaries of the data.</p>
   <h3>What the Budget row says</h3>
-  <p>The event-day AR is negative and unusually large relative to the notebook’s baseline. The full-window CAR is positive because gains in abnormal returns on other days outweigh the event-day decline. Post-event volatility is also markedly higher than the pre-event estimate. Together these values describe a sharp one-day move and a choppy following window; they do not identify which news drove either pattern.</p>
+  <p>The event-day <span class="m">AR_0</span> is negative and unusually large relative to the notebook’s baseline. The full-window <span class="m">CAR(-5,+5)</span> is positive because gains in abnormal returns on other days outweigh the event-day decline. Post-event volatility is also markedly higher than the pre-event estimate. Together these values describe a sharp one-day move and a choppy following window; they do not identify which news drove either pattern.</p>
   <h3>Event-day significance and window significance disagree</h3>
   <p>For the Budget, Test 2 is significant (p = 0.0003), while Test 1 is not (p = 0.5374). The tests answer different questions: whether the event-day abnormal return was unusual relative to the estimation-window variation, and whether the mean abnormal return across the full 11-day window differed from zero.</p>
   <h3>Closely spaced dates</h3>
