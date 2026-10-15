@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Event Study of the NIFTY Financial Services Index around Union Budget and RBI MPC Announcements (FY2026)</title>
-<meta name="description" content="Companion explainer for an event study of abnormal returns and volatility in the NIFTY Financial Services Index, FY2026.">
+<title>NIFTY Financial Services Index event study: FY2025–26</title>
+<meta name="description" content="A concise, source-linked explanation of an event study of the NIFTY Financial Services Index around Union Budget and RBI MPC announcements in FY2025–26.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
@@ -12,8 +12,8 @@
 </head>
 <body>
 <header class="top"><div class="wrap">
-  <span>Companion page by the author</span>
-  <nav><a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6518198">Paper (SSRN 6518198)</a><a href="assets/ssrn-6518198.pdf">PDF</a><a href="assets/NIFTY_ICFMCF.ipynb">Notebook</a></nav>
+  <span>Research companion · Deepak Kambala</span>
+  <nav><a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6518198">Paper (SSRN 6518198)</a><a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/paper.pdf">PDF</a><a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY_ICFMCF.ipynb">Code / notebook</a><a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY%20FINANCIAL%20SERVICES-31-03-2025-to-31-03-2026.csv">Dataset</a></nav>
 </div></header>
 
 <div class="wrap page">
@@ -23,19 +23,19 @@
 
 <main>
 <header class="title">
-  <h1>An Event Study of Abnormal Returns and Volatility Patterns in India's NIFTY Financial Services Index Around Union Budget and RBI Monetary Policy Committee Announcements (FY2026)</h1>
+  <h1>What happened to the NIFTY Financial Services Index around the Union Budget and RBI MPC announcements?</h1>
   <p class="by">Deepak Kambala<br><span>JNTUK University College of Engineering Narasaraopet</span></p>
 </header>
 
 <section id="question">
   <h2>Question</h2>
-  <p>The paper asks whether the Union Budget and Reserve Bank of India Monetary Policy Committee (MPC) announcements produced statistically significant abnormal returns in the NIFTY Financial Services Index during FY2026. The index tracks the 20 largest NSE-listed financial companies by free-float market capitalisation, so its constituents' revenues (interest spreads, treasury gains, insurance premiums, capital-market activity) depend directly on rate and tax decisions.</p>
-  <p>The study measures three things around six dated events: the event-day abnormal return, the cumulative abnormal return over an 11-day window, and the change in return volatility. Its headline result is that the Union Budget on 1 February 2026 was followed by an event-day abnormal return of −2.264% and a post-event volatility of 1.798% against a pre-event 0.544%. It was the only event significant at the 1% level.</p>
+  <p>This study examines whether six policy announcements were followed by returns that differed from the index's recent average return. The index is a sectoral benchmark of the 20 largest NSE-listed financial-services companies by free-float market capitalisation.</p>
+  <p>It reports the return on the announcement day, the cumulative abnormal return over 11 trading days, and the change in return volatility. The largest reaction was on the Union Budget 2026 event day: abnormal return −2.264%. The study's second test reports <i>t</i> = −4.159 and <i>p</i> = 0.0003 for that observation. This is evidence of an unusually large movement relative to the study's baseline; it does not by itself prove that the announcement caused the entire move.</p>
 </section>
 
 <section id="data">
   <h2>Data and events</h2>
-  <p>The data are daily OHLCV records for the index from the NSE historical data portal: 247 trading days. The notebook reports the span as 1 April 2025 to 30 March 2026; the paper states 31 March 2025 to 31 March 2026 (see <a href="#notes">Notes</a>). Returns are arithmetic daily percentage changes in the closing level.</p>
+  <p>The dataset contains daily open, high, low, close, volume and turnover fields for the NIFTY Financial Services Index. The paper describes the sample as 31 March 2025 to 31 March 2026 with 247 trading days; the CSV and notebook data run from 1 April 2025 to 30 March 2026. Returns are arithmetic percentage changes in the closing level.</p>
   <table>
     <caption>Events analysed. Event day t<sub>0</sub> is the announcement date or, if that is not a trading day, the next trading day.</caption>
     <thead><tr><th>Event</th><th>Announcement date</th></tr></thead>
@@ -43,12 +43,12 @@
       <tr><td>RBI MPC, June 2025</td><td>6 Jun 2025</td></tr><tr><td>RBI MPC, August 2025</td><td>6 Aug 2025</td></tr><tr><td>RBI MPC, October 2025</td><td>1 Oct 2025</td></tr><tr><td>RBI MPC, December 2025</td><td>5 Dec 2025</td></tr><tr><td>Union Budget 2026</td><td>1 Feb 2026</td></tr><tr><td>RBI MPC, February 2026</td><td>6 Feb 2026</td></tr>
     </tbody>
   </table>
-  <p>The April 2025 MPC decision (9 April) is excluded because it falls too close to the start of the sample to leave a full estimation window.</p>
+  <p>The paper identifies seven relevant policy events, but analyses six. The April 2025 MPC decision is excluded because there are not enough earlier observations for the 30-day estimation window.</p>
 </section>
 
 <section id="method">
   <h2>Method</h2>
-  <p>The design follows the standard event study of Brown and Warner (1985) and MacKinlay (1997), with a mean-adjusted return model: the expected return on each event-window day is the mean return over a preceding estimation window. No market-index benchmark is used.</p>
+  <p>The design follows the standard event-study framework described by Brown and Warner (1985) and MacKinlay (1997). It uses a mean-adjusted return model: the expected return during an event window is the index's mean return in a preceding estimation window. No separate market benchmark is used.</p>
   <figure>
     <svg viewBox="0 0 660 150" role="img" aria-label="Timeline: estimation window from t0 minus 35 to t0 minus 6, event window from t0 minus 5 to t0 plus 5, event day t0, post-event window t0 to t0 plus 5">
       <g class="ax"><line x1="30" y1="76" x2="640" y2="76"/></g>
@@ -73,14 +73,14 @@
   <h3>Abnormal and cumulative abnormal returns</h3>
   <div class="eq">R_t = \frac{\text{Close}_t - \text{Close}_{t-1}}{\text{Close}_{t-1}} \times 100, \qquad \bar R_i = \frac{1}{30}\sum_{t\in L} R_{it}</div>
   <div class="eq">AR_{it} = R_{it} - \bar R_i, \qquad CAR_i(-5,+5) = \sum_{t=-5}^{+5} AR_{it}</div>
-  <p>A negative <span class="m">AR_{it}</span> means the index returned less than its own average over the estimation window. <span class="m">CAR_i</span> sums all eleven days, including the five before the event.</p>
+  <p>A negative <span class="m">AR_{it}</span> means the index returned less than its estimation-window average. <span class="m">CAR_i</span> is the sum across all 11 trading days, including the five days before the event.</p>
   <h3>Volatility</h3>
   <div class="eq">\sigma_{i,\text{pre}} = \operatorname{std}\{R_t : t\in[t_0-35,\,t_0-6]\}, \quad \sigma_{i,\text{post}} = \operatorname{std}\{R_t : t\in[t_0,\,t_0+5]\}, \quad \Delta\sigma_i = \sigma_{i,\text{post}}-\sigma_{i,\text{pre}}</div>
-  <p>The post-event window has six observations because it includes the event day. The paper also plots a 30-day rolling standard deviation for the whole sample.</p>
+  <p>The post-event volatility uses the event day and the following five trading days. The paper also plots a 30-day rolling standard deviation for the full sample.</p>
   <h3>Significance tests</h3>
-  <p><strong>Test 1</strong> is a one-sample t-test of whether the mean of the 11 window ARs is zero (10 degrees of freedom). <strong>Test 2</strong>, which the paper calls the Patell test, standardises the event-day abnormal return by the estimation-window standard deviation. In the notebook it is</p>
+  <p><strong>Test 1</strong> is a one-sample t-test of whether the mean of the 11 window abnormal returns is zero (10 degrees of freedom). <strong>Test 2</strong> is described in the paper as a Patell standardised event-day test. The notebook calculates the event-day abnormal return divided by the estimation-window standard deviation:</p>
   <div class="eq">t_2 = \frac{AR_{i0}}{\sigma_{i,\text{pre}}}, \qquad p = 2\,P(T_{29} > |t_2|)</div>
-  <p>with a Student-t reference distribution on <span class="m">n_{\text{est}}-1 = 29</span> degrees of freedom. This reproduces the paper's table: for the Budget, −2.264 / 0.544 ≈ −4.16.</p>
+  <p>It then uses a two-sided Student's <i>t</i> reference distribution with 29 degrees of freedom. For the Budget, −2.264 / 0.544 is approximately −4.16. This is the statistic implemented in the notebook; it should not be read as a full market-model causal test.</p>
 </section>
 
 <section id="results">
@@ -97,35 +97,34 @@
       <tr><td>MPC Feb 2026</td><td>0.430</td><td>3.018</td><td>0.625</td><td>0.695</td><td>0.070</td><td>0.5193</td><td>0.688</td><td>0.4969</td></tr>
     </tbody>
   </table>
-  <p>Test 2 gives two rejections of a zero event-day abnormal return: the Budget (p = 0.0003) and the October 2025 MPC (p = 0.0401). Test 1 rejects for none of the six events. The Budget's post-event volatility is 1.798% against 0.544% before, a ratio of about 3.3, and its Δσ of +1.253 is the largest by a wide margin; the next largest is +0.095 (December 2025 MPC). The paper's Budget CAR of +3.015% is positive even though the event-day abnormal return is −2.264%, so the window's net movement comes from the other ten days.</p>
+  <p>On Test 2, the Budget (p = 0.0003) and October 2025 MPC (p = 0.0401) are statistically significant at the 5% level; only the Budget meets the 1% threshold. Test 1 is not significant for any event. Budget volatility rises from 0.544% before the event to 1.798% after it, a change of +1.253 percentage points. Its full-window CAR is +3.015% despite the −2.264% event-day abnormal return, meaning the other days in the 11-day window more than offset the event-day decline.</p>
 </section>
 
 <section id="reading">
   <h2>Reading the results</h2>
-  <p>The following points are the explainer's analysis, derived from the paper's definitions and tables rather than stated by the paper.</p>
+  <p>These are direct readings of the reported numbers, not claims that the study tested a particular news explanation.</p>
   <h3>The two February 2026 windows overlap</h3>
-  <p>The Budget (1 February) and the February MPC decision (6 February) are five trading days apart. The Budget's days t₀ to t₀+5 are therefore the MPC's days t₀−5 to t₀, and the Budget day itself sits inside the MPC's event window. The two CARs, +3.015% and +3.018%, therefore share six of their eleven daily terms. Figure 6.1 of the paper agrees: its February MPC row shows an abnormal return of about −2.31% on D−5, which is the Budget day's return. The two events are not independent observations.</p>
+  <p>The Budget event (1 February) and the February MPC decision (6 February) are close together. Their 11-day windows therefore overlap. The reported CARs for these two events should not be treated as independent pieces of evidence.</p>
   <h3>Event-day significance and window significance disagree</h3>
-  <p>For the Budget, Test 2 is strongly significant and Test 1 is not (p = 0.54). Test 1 averages eleven daily ARs of both signs, so a single large negative day can be offset by later positive days. The two tests answer different questions: whether event day was unusual, and whether the window as a whole departed from zero.</p>
+  <p>For the Budget, Test 2 is significant (p = 0.0003), while Test 1 is not (p = 0.5374). The tests answer different questions: whether the event-day abnormal return was unusual relative to the estimation-window variation, and whether the mean abnormal return across the full 11-day window differed from zero.</p>
   <h3>Scope</h3>
   <ul>
     <li>Six events and one index. The paper itself attributes non-significant results to low power.</li>
     <li>Twelve tests are reported (two per event) with no multiple-comparison adjustment described; the October 2025 result at p = 0.0401 is the weaker of the two rejections.</li>
     <li>The mean-adjusted model has no market benchmark, so broad market moves in the window are not removed from the abnormal returns.</li>
-    <li>The paper notes that the size of a reaction depends on the information surprise, but it does not measure expectations or surprise. Its explanations for the Budget reaction (deficit target, capital-gains changes, banking-sector measures) are offered as possibilities and are not tested.</li>
+    <li>The study does not measure investor expectations, the surprise component of an announcement, or the independent effect of other news on the same days.</li>
   </ul>
 </section>
 
 <section id="notes">
   <h2>Notes on the source</h2>
-  <p>Comparing the paper with the accompanying notebook shows these inconsistencies. They do not change the reported numbers, which the notebook reproduces.</p>
+  <p>For transparency, the paper and the executable notebook describe the inputs and method slightly differently in places:</p>
   <ul>
     <li><b>Sample period.</b> Paper: 31 Mar 2025 to 31 Mar 2026. Notebook output: 1 Apr 2025 to 30 Mar 2026, 247 trading days.</li>
-    <li><b>Window gap.</b> The text describes a one-day separation between estimation and event windows. The equations (L ends at t₀−6, W starts at t₀−5) and the code leave none.</li>
-    <li><b>Test 2.</b> The paper calls it the Patell test. The implemented statistic is AR₀ divided by σ<sub>pre</sub>, without a prediction-error adjustment; a comment in the code gives a different formula (σ/√n) that is not the one executed.</li>
-    <li><b>Event count.</b> The paper says seven events were identified. The notebook defines eight, including a Union Budget dated 1 Feb 2025 that precedes the data; it and the April 2025 MPC are dropped for lack of estimation data.</li>
-    <li><b>Rounding.</b> The text gives the Budget's pre-event σ as 0.545% in one place and 0.544% in the table; the notebook value is 0.5445%.</li>
-    <li><b>Volatility wording.</b> The abstract's "near tripling" understates the ratio of about 3.3.</li>
+    <li><b>Event count.</b> The paper says seven relevant events were identified and six were analysed. The notebook's event dictionary also includes the February 2025 Union Budget, which is outside the sample and produces no usable result.</li>
+    <li><b>Test 2 description.</b> The paper labels Test 2 a Patell test. The notebook implementation is the event-day abnormal return divided by the estimation-window standard deviation, followed by a two-sided <i>t</i> p-value.</li>
+    <li><b>Rounding.</b> The Budget's pre-event volatility appears as 0.544% in the results table and about 0.545% in the discussion; the difference is rounding.</li>
+    <li><b>Interpretation.</b> The paper discusses possible explanations for the Budget reaction, but the event study does not separately test those explanations.</li>
   </ul>
 </section>
 
@@ -137,7 +136,7 @@
     <li>A. C. MacKinlay (1997). Event studies in economics and finance. <i>Journal of Economic Literature</i> 35, 13–39.</li>
     <li>J. A. Patell (1976). Corporate forecasts of earnings per share and stock price behavior: Empirical test. <i>Journal of Accounting Research</i> 14, 246–276.</li>
   </ol>
-  <p class="meta">Data: NSE India historical index data. Code: <a href="assets/NIFTY_ICFMCF.ipynb">NIFTY_ICFMCF.ipynb</a>. This page summarises the paper and adds the analysis marked above; the paper is the authoritative source.</p>
+  <p class="meta">Data: <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY%20FINANCIAL%20SERVICES-31-03-2025-to-31-03-2026.csv">NSE India historical index dataset</a>. Code: <a href="https://github.com/Deepak-Kambala/nifty-financial-services-event-study/blob/main/NIFTY_ICFMCF.ipynb">NIFTY_ICFMCF.ipynb</a>. This page summarises the paper and adds the analysis marked above; the paper is the authoritative source.</p>
 </section>
 </main>
 </div>
